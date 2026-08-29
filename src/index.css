@@ -1,0 +1,325 @@
+@import "tailwindcss";
+
+/* =========================================================
+   OPERON CLEAN ENTERPRISE DESIGN SYSTEM
+   High-contrast, dark-mode first, precision styling
+   ========================================================= */
+
+:root {
+  /* Dark Mode Foundation */
+  --app-bg: #08090D;
+  --app-bg-secondary: #0E1015;
+  --surface-base: rgba(255, 255, 255, 0.04);
+  --surface-elevated: rgba(255, 255, 255, 0.07);
+  --surface-strong: rgba(255, 255, 255, 0.10);
+  --surface-subtle: rgba(255, 255, 255, 0.02);
+
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-interactive: rgba(255, 255, 255, 0.20);
+  --border-accent: rgba(255, 176, 0, 0.40);
+
+  --text-primary: #F5F5F7;
+  --text-secondary: rgba(245, 245, 247, 0.64);
+  --text-muted: rgba(245, 245, 247, 0.40);
+  --text-dim: rgba(245, 245, 247, 0.25);
+
+  /* Semantic Accents */
+  --accent-primary: #FFB000;
+  --accent-primary-hover: #FFC033;
+  --accent-primary-text: #08090D;
+  --color-success: #22D3A7;
+  --color-info: #5EA0FF;
+  --color-warning: #FFB020;
+  --color-danger: #FF5C6C;
+
+  /* Geometry */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+}
+
+/* Light Mode Overrides */
+.light {
+  --app-bg: #F8F9FA;
+  --app-bg-secondary: #FFFFFF;
+  --surface-base: rgba(0, 0, 0, 0.03);
+  --surface-elevated: rgba(0, 0, 0, 0.05);
+  --surface-strong: rgba(0, 0, 0, 0.08);
+  --surface-subtle: rgba(0, 0, 0, 0.015);
+
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.10);
+  --border-strong: rgba(0, 0, 0, 0.16);
+  --border-interactive: rgba(0, 0, 0, 0.22);
+  --border-accent: rgba(255, 176, 0, 0.60);
+
+  --text-primary: #121316;
+  --text-secondary: #525866;
+  --text-muted: #868C98;
+  --text-dim: #A0A6B1;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-synthesis: none;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    background-color: var(--app-bg);
+    color: var(--text-primary);
+  }
+
+  body {
+    background-color: var(--app-bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist", "Inter", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "JetBrains Mono", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* =========================================================
+   APP CONTAINER
+   ========================================================= */
+
+.app-container {
+  min-height: 100vh;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+}
+
+/* =========================================================
+   ENTERPRISE BUTTON SYSTEM
+   ========================================================= */
+
+/* Primary CTA: Linear-grade Amber Pill (#FFB000) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-primary);
+  color: var(--accent-primary-text);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.15s ease,
+    transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-primary-hover);
+  box-shadow: 0 2px 8px rgba(255, 176, 0, 0.3);
+  transform: translateY(-0.5px);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-weight: 550;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.15s ease,
+    transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   STATUS INDICATOR DOTS
+   ========================================================= */
+
+.status-dot-running {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-info);
+  animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.status-dot-completed {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+}
+
+.status-dot-pending {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+}
+
+.status-dot-failed {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-danger);
+}
+
+.status-dot-paused {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+/* =========================================================
+   TYPOGRAPHY SPECIFICATIONS
+   ========================================================= */
+
+.page-title {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .page-title {
+    font-size: 32px;
+  }
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.stat-display {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* =========================================================
+   SUBTLE SCROLLBARS
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Operon",
+  "description": "OPERON — Autonomous Operations, Under Human Control. Multi-agent operations platform for Support, Finance, HR, and Operations with human-in-the-loop governance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
