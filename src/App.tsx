@@ -11,8 +11,14 @@ import { SkillsPage } from './pages/SkillsPage';
 import { ActivityPage } from './pages/ActivityPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { GovernancePage } from './pages/GovernancePage';
+import { IncidentsPage } from './pages/IncidentsPage';
 import { ToastContainer } from './components/ToastContainer';
-import { WorkflowDefinition, WorkspaceType } from './types';
+import { PolicySimulatorModal } from './components/PolicySimulatorModal';
+import { ExecutionReplayTheaterModal } from './components/ExecutionReplayTheaterModal';
+import { GovernanceCertificateModal } from './components/GovernanceCertificateModal';
+import { ArchitectureModal } from './components/ArchitectureModal';
+import { WorkflowDefinition, WorkspaceType, ApprovalCase } from './types';
 import {
   LayoutDashboard,
   GitMerge,
@@ -34,6 +40,14 @@ export function App() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
+  // Additional Feature Modals State
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [isReplayOpen, setIsReplayOpen] = useState(false);
+  const [replayCase, setReplayCase] = useState<ApprovalCase | null>(null);
+  const [isCertificateOpen, setIsCertificateOpen] = useState(false);
+  const [certificateCase, setCertificateCase] = useState<ApprovalCase | null>(null);
+  const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
+
   // New Workflow Modal Form State
   const [wfName, setWfName] = useState('');
   const [wfDesc, setWfDesc] = useState('');
@@ -45,6 +59,25 @@ export function App() {
   const handleSelectWorkflow = (wf: WorkflowDefinition) => {
     setSelectedWorkflow(wf);
     setActivePage('workflows');
+  };
+
+  const handleOpenReplay = (caseItem: ApprovalCase) => {
+    setReplayCase(caseItem);
+    setIsReplayOpen(true);
+  };
+
+  const handleOpenCertificate = (caseItem: ApprovalCase) => {
+    setCertificateCase(caseItem);
+    setIsCertificateOpen(true);
+  };
+
+  const handleLaunchDemoScenario = () => {
+    store.setActiveWorkspace('support');
+    const targetCase = store.cases.find((c) => c.caseNumber === 'CS-2041') || store.cases[0];
+    if (targetCase) {
+      setReplayCase(targetCase);
+      setIsReplayOpen(true);
+    }
   };
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -97,6 +130,12 @@ export function App() {
             onOpenCreateWorkflow={() => setIsCreateModalOpen(true)}
             onNavigateToTab={(tab) => setActivePage(tab as PageTab)}
             activeAgentsCount={store.agents.filter((a) => a.status === 'active').length}
+            onOpenReplay={handleOpenReplay}
+            onOpenCertificate={handleOpenCertificate}
+            onOpenSimulator={() => setIsSimulatorOpen(true)}
+            onOpenArchitecture={() => setIsArchitectureOpen(true)}
+            onOpenDemoScenario={handleLaunchDemoScenario}
+            onInjectDemoCase={store.injectDemoCase}
           />
         );
 
@@ -110,6 +149,8 @@ export function App() {
             onSelectWorkflow={handleSelectWorkflow}
             onTriggerRun={store.triggerWorkflowRun}
             isExecuting={store.isExecuting}
+            templates={store.workflowTemplates}
+            onInstantiateTemplate={store.instantiateWorkflowTemplate}
           />
         );
 
@@ -125,6 +166,40 @@ export function App() {
             onBatchReject={store.batchRejectCases}
             onInjectDemoCase={store.injectDemoCase}
             onResetDemoData={store.resetDemoData}
+            onOpenSimulator={() => setIsSimulatorOpen(true)}
+            onOpenReplay={handleOpenReplay}
+            onOpenCertificate={handleOpenCertificate}
+            savedViews={store.savedViews}
+            activeSavedViewId={store.activeSavedViewId}
+            onSelectSavedView={store.setActiveSavedViewId}
+            decisionHistory={store.decisionHistory}
+            onAssignCase={store.assignCase}
+            onEscalateCase={store.escalateCase}
+            onAddCaseNote={store.addCaseNote}
+            onBulkTag={store.bulkTagCases}
+          />
+        );
+
+      case 'governance':
+        return (
+          <GovernancePage
+            policyVersions={store.policyVersions}
+            policyConflicts={store.policyConflicts}
+            policyConfig={store.policyConfig}
+            updatePolicyConfig={store.updatePolicyConfig}
+            onRollback={store.rollbackPolicyVersion}
+            onRollbackPolicy={store.rollbackPolicyVersion}
+            onPublishVersion={store.publishPolicyVersion}
+            onPublishPolicy={store.publishPolicyVersion}
+          />
+        );
+
+      case 'incidents':
+        return (
+          <IncidentsPage
+            incidents={store.incidents}
+            onResolveIncident={store.resolveIncident}
+            onSimulateChaos={store.simulateChaos}
           />
         );
 
@@ -194,6 +269,8 @@ export function App() {
           setSelectedWorkflow(store.workflows[0]);
           setActivePage('workflows');
         }}
+        onOpenSimulator={() => setIsSimulatorOpen(true)}
+        onOpenArchitecture={() => setIsArchitectureOpen(true)}
         isProfileModalOpen={isProfileModalOpen}
         setIsProfileModalOpen={setIsProfileModalOpen}
       />
@@ -208,11 +285,14 @@ export function App() {
           }}
           pendingApprovalsCount={pendingApprovalsCount}
           activeAgentsCount={activeAgentsCount}
+          openIncidentsCount={store.incidents.filter((i) => i.status === 'INVESTIGATING' || i.status === 'MITIGATED').length}
           agents={store.agents}
           store={store}
           activeWorkspace={store.activeWorkspace}
           setActiveWorkspace={store.setActiveWorkspace}
           onOpenProfileModal={() => setIsProfileModalOpen(true)}
+          onOpenSimulator={() => setIsSimulatorOpen(true)}
+          onOpenArchitecture={() => setIsArchitectureOpen(true)}
         />
 
         {/* Main Content Area */}
@@ -404,6 +484,46 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Interactive Policy Boundary Simulator Modal */}
+      <PolicySimulatorModal
+        isOpen={isSimulatorOpen}
+        onClose={() => setIsSimulatorOpen(false)}
+        policyConfig={store.policyConfig}
+        onUpdatePolicyConfig={store.updatePolicyConfig}
+        onSavePolicy={store.updatePolicyConfig}
+        onInjectCase={store.injectCustomCase}
+        onInjectDemoCase={store.injectDemoCase}
+        activeWorkspace={store.activeWorkspace}
+      />
+
+      {/* Step-by-Step DAG Execution Replay Theater Modal */}
+      <ExecutionReplayTheaterModal
+        isOpen={isReplayOpen}
+        onClose={() => setIsReplayOpen(false)}
+        caseItem={replayCase || store.cases[0]}
+        onApprove={(id, notes) => {
+          store.approveCase(id, notes);
+          setIsReplayOpen(false);
+        }}
+        onReject={(id, notes) => {
+          store.rejectCase(id, notes);
+          setIsReplayOpen(false);
+        }}
+      />
+
+      {/* SOC2 / ISO-27001 Cryptographic Governance Certificate Modal */}
+      <GovernanceCertificateModal
+        isOpen={isCertificateOpen}
+        onClose={() => setIsCertificateOpen(false)}
+        caseData={certificateCase || store.cases.find((c) => c.status === 'approved') || store.cases[0]}
+      />
+
+      {/* 8-Agent Topological Architecture Modal */}
+      <ArchitectureModal
+        isOpen={isArchitectureOpen}
+        onClose={() => setIsArchitectureOpen(false)}
+      />
     </div>
   );
 }

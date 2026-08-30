@@ -37,6 +37,8 @@ interface HeaderProps {
   onNavigateToTab?: (tab: PageTab) => void;
   onOpenCreateWorkflow?: () => void;
   onRunDemoWorkflow?: () => void;
+  onOpenSimulator?: () => void;
+  onOpenArchitecture?: () => void;
   isProfileModalOpen?: boolean;
   setIsProfileModalOpen?: (open: boolean) => void;
 }
@@ -54,6 +56,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateToTab,
   onOpenCreateWorkflow,
   onRunDemoWorkflow,
+  onOpenSimulator,
+  onOpenArchitecture,
   isProfileModalOpen,
   setIsProfileModalOpen,
 }) => {
@@ -336,7 +340,31 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right: Operational Status, Approvals Bell, User Profile */}
-        <div className="flex items-center space-x-3 shrink-0">
+        <div className="flex items-center space-x-2.5 shrink-0">
+          {onOpenSimulator && (
+            <button
+              id="header-open-simulator-btn"
+              onClick={onOpenSimulator}
+              className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] hover:bg-amber-500/15 border border-white/[0.08] hover:border-amber-500/30 text-[11px] font-mono text-white/70 hover:text-[#FFB000] transition-colors cursor-pointer"
+              title="Test policy boundaries and auto-refund caps in real-time sandbox"
+            >
+              <Zap className="w-3 h-3 text-[#FFB000]" />
+              <span>Policy Simulator</span>
+            </button>
+          )}
+
+          {onOpenArchitecture && (
+            <button
+              id="header-open-architecture-btn"
+              onClick={onOpenArchitecture}
+              className="hidden lg:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] hover:bg-purple-500/15 border border-white/[0.08] hover:border-purple-500/30 text-[11px] font-mono text-white/70 hover:text-purple-300 transition-colors cursor-pointer"
+              title="View 8-agent topology and invariant data flow"
+            >
+              <Layers className="w-3 h-3 text-purple-400" />
+              <span>Architecture</span>
+            </button>
+          )}
+
           {/* Operational Status Pill */}
           <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] font-mono text-white/70">
             <span className="w-1.5 h-1.5 rounded-full bg-[#22D3A7]" />

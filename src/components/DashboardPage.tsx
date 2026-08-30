@@ -4,6 +4,7 @@ import { ApprovalCase, AuditLogEntry, AnalyticsData, WorkflowDefinition, Workspa
 import { StatusBadge } from './StatusBadge';
 import { DecisionFabricVisualizer } from './DecisionFabricVisualizer';
 import { RecentWorkflowsWidget } from './RecentWorkflowsWidget';
+import { GuidedDemoTourBanner } from './GuidedDemoTourBanner';
 import {
   Play,
   CheckCircle2,
@@ -26,6 +27,8 @@ import {
   UserCheck,
   Cpu,
   RotateCw,
+  Sliders,
+  Award,
 } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -48,6 +51,12 @@ interface DashboardPageProps {
   onOpenCreateWorkflow?: () => void;
   onNavigateToTab?: (tab: string) => void;
   activeAgentsCount?: number;
+  onOpenReplay?: (caseItem: ApprovalCase) => void;
+  onOpenCertificate?: (caseItem: ApprovalCase) => void;
+  onOpenSimulator?: () => void;
+  onOpenArchitecture?: () => void;
+  onOpenDemoScenario?: () => void;
+  onInjectDemoCase?: (workspace?: WorkspaceType, amount?: number) => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -70,6 +79,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onOpenCreateWorkflow,
   onNavigateToTab,
   activeAgentsCount = 8,
+  onOpenReplay,
+  onOpenCertificate,
+  onOpenSimulator,
+  onOpenArchitecture,
+  onOpenDemoScenario,
+  onInjectDemoCase,
 }) => {
   const workspaceWorkflows = workflows.filter((w) => w.workspace === activeWorkspace);
   const workspaceCases = cases.filter((c) => c.workspace === activeWorkspace);
@@ -116,6 +131,47 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       id="dashboard-container"
       className="flex-1 overflow-y-auto px-6 py-6 text-white space-y-6 select-none font-sans max-w-[1600px] mx-auto w-full"
     >
+      {/* 0. INTERACTIVE GUIDED DEMO TOUR BANNER */}
+      <GuidedDemoTourBanner
+        currentCase={cases.find((c) => c.status === 'pending') || cases[0] || null}
+        pendingCasesCount={pendingCasesCount}
+        onTriggerScenario={(scenario) => {
+          if (scenario === 'A') {
+            if (onInjectDemoCase) {
+              onInjectDemoCase('support', 45);
+            } else if (onOpenDemoScenario) {
+              onOpenDemoScenario();
+            }
+          } else if (scenario === 'B') {
+            if (onInjectDemoCase) {
+              onInjectDemoCase('support', 249.5);
+            } else if (onOpenDemoScenario) {
+              onOpenDemoScenario();
+            }
+          } else {
+            if (onInjectDemoCase) {
+              onInjectDemoCase('finance', 4500);
+            } else if (onOpenDemoScenario) {
+              onOpenDemoScenario();
+            }
+          }
+        }}
+        onApproveCase={(caseId) => onApprove(caseId)}
+        onOpenApprovals={() => onNavigateToTab?.('approvals')}
+        onOpenSimulator={() => onOpenSimulator?.()}
+        onOpenCertificate={(c) => {
+          const target = c || cases.find((x) => x.status === 'approved') || cases[0];
+          if (target && onOpenCertificate) {
+            onOpenCertificate(target);
+          }
+        }}
+        executionMode="DEMO"
+        activeWorkspace={activeWorkspace}
+        onLaunchScenario={onOpenDemoScenario}
+        onOpenPolicySimulator={onOpenSimulator}
+        onNavigateApprovals={() => onNavigateToTab?.('approvals')}
+      />
+
       {/* 1. HERO SECTION (Compact 220-260px Height) */}
       <section
         id="dashboard-hero"
@@ -197,6 +253,30 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <Plus className="w-4 h-4 text-[#08090D] stroke-[2.5]" />
               <span>Create Workflow</span>
             </button>
+
+            <div className="flex items-center gap-2">
+              {onOpenSimulator && (
+                <button
+                  onClick={onOpenSimulator}
+                  className="btn-secondary min-h-[38px] px-3.5 text-xs text-[#FFB000] border-amber-500/30 hover:border-amber-500/60"
+                  title="Test policy boundaries and auto-refund caps"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-[#FFB000]" />
+                  <span>Simulator</span>
+                </button>
+              )}
+
+              {onOpenArchitecture && (
+                <button
+                  onClick={onOpenArchitecture}
+                  className="btn-secondary min-h-[38px] px-3.5 text-xs text-purple-300 border-purple-500/30 hover:border-purple-500/60"
+                  title="View 8-agent topology and invariant data flow"
+                >
+                  <Layers className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Architecture</span>
+                </button>
+              )}
+            </div>
 
             <button
               onClick={() => onTriggerRun(mainWorkflow.id)}

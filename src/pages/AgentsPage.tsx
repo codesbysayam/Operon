@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AGENT_WORKFORCE } from '../data/agentsAndSkills';
 import { AgentInfo } from '../types';
-import { AgentDetailModal } from '../components/AgentDetailModal';
+import { AgentDiagnosticsDrawer } from '../components/AgentDiagnosticsDrawer';
 import { AgentThroughputSparkline } from '../components/AgentThroughputSparkline';
 import { Bot, Sparkles, Activity, ShieldCheck, Power } from 'lucide-react';
 
@@ -136,7 +136,12 @@ export const AgentsPage: React.FC<AgentsPageProps> = ({
         })}
       </div>
 
-      <AgentDetailModal agent={selectedAgent} onClose={() => setSelectedAgent(null)} />
+      <AgentDiagnosticsDrawer
+        isOpen={Boolean(selectedAgent)}
+        agent={selectedAgent}
+        onClose={() => setSelectedAgent(null)}
+        onToggleStatus={onToggleAgentStatus}
+      />
     </div>
   );
 };

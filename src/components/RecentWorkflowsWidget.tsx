@@ -188,7 +188,7 @@ export const RecentWorkflowsWidget: React.FC<RecentWorkflowsWidgetProps> = ({
                     e.stopPropagation();
                     if (isThisExecuting && onCancelRun) {
                       onCancelRun();
-                    } else {
+                    } else if (onTriggerRun) {
                       onTriggerRun(wf.id);
                     }
                   }}

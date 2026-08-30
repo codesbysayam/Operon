@@ -11,6 +11,12 @@ import {
   Building2,
   AlertTriangle,
   Cpu,
+  Sliders,
+  Layers,
+  Sparkles,
+  Flame,
+  FileCheck2,
+  Lock,
 } from 'lucide-react';
 import { WorkspaceType, AgentInfo } from '../types';
 
@@ -20,6 +26,8 @@ export type PageTab =
   | 'agents'
   | 'skills'
   | 'approvals'
+  | 'governance'
+  | 'incidents'
   | 'activity'
   | 'analytics'
   | 'settings';
@@ -29,12 +37,15 @@ interface SidebarProps {
   setActivePage: (page: PageTab) => void;
   pendingApprovalsCount: number;
   activeAgentsCount?: number;
+  openIncidentsCount?: number;
   agents?: AgentInfo[];
   store?: { agents: AgentInfo[] };
   activeWorkspace: WorkspaceType;
   setActiveWorkspace: (ws: WorkspaceType) => void;
   onOpenCreateModal?: () => void;
   onOpenProfileModal?: () => void;
+  onOpenSimulator?: () => void;
+  onOpenArchitecture?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = (props) => {
@@ -43,10 +54,13 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     setActivePage,
     pendingApprovalsCount,
     activeAgentsCount: propActiveCount,
+    openIncidentsCount = 1,
     agents,
     activeWorkspace,
     setActiveWorkspace,
     onOpenProfileModal,
+    onOpenSimulator,
+    onOpenArchitecture,
   } = props;
 
   const store = props.store || { agents: agents || [] };
@@ -60,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     label: string;
     icon: React.ReactNode;
     badge?: string | number;
-    badgeVariant?: 'amber' | 'neutral' | 'success';
+    badgeVariant?: 'amber' | 'neutral' | 'success' | 'red';
   }[] = [
     {
       id: 'dashboard',
@@ -69,9 +83,9 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     },
     {
       id: 'workflows',
-      label: 'Workflows',
+      label: 'Workflows & Blueprints',
       icon: <GitMerge className="w-4 h-4" />,
-      badge: 4,
+      badge: 6,
       badgeVariant: 'neutral',
     },
     {
@@ -89,13 +103,27 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
       badgeVariant: pendingApprovalsCount > 0 ? 'amber' : 'neutral',
     },
     {
+      id: 'governance',
+      label: 'Policy Governance',
+      icon: <FileCheck2 className="w-4 h-4" />,
+      badge: 'v2.4.0',
+      badgeVariant: 'neutral',
+    },
+    {
+      id: 'incidents',
+      label: 'Incidents & Chaos',
+      icon: <Flame className="w-4 h-4" />,
+      badge: openIncidentsCount > 0 ? `${openIncidentsCount} Active` : undefined,
+      badgeVariant: openIncidentsCount > 0 ? 'red' : 'neutral',
+    },
+    {
       id: 'activity',
       label: 'Activity Logs',
       icon: <Activity className="w-4 h-4" />,
     },
     {
       id: 'analytics',
-      label: 'Analytics',
+      label: 'Analytics & SLA',
       icon: <BarChart3 className="w-4 h-4" />,
     },
     {
@@ -104,6 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
       icon: <Settings className="w-4 h-4" />,
     },
   ];
+
 
   return (
     <aside
@@ -207,6 +236,48 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
             })}
           </nav>
         </div>
+
+        {/* Governance & Sandboxing Tools */}
+        {(onOpenSimulator || onOpenArchitecture) && (
+          <div className="pt-3 border-t border-white/[0.08]">
+            <p className="px-2 mb-1.5 text-[10px] font-semibold tracking-wider text-white/40 uppercase font-mono">
+              Governance Tools
+            </p>
+            <div className="space-y-1">
+              {onOpenSimulator && (
+                <button
+                  id="sidebar-simulator-btn"
+                  onClick={onOpenSimulator}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-white/70 hover:text-[#FFB000] hover:bg-amber-500/10 border border-transparent hover:border-amber-500/25 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Sliders className="w-4 h-4 text-[#FFB000]" />
+                    <span>Policy Simulator</span>
+                  </div>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-[#FFB000] border border-amber-500/25">
+                    Sandbox
+                  </span>
+                </button>
+              )}
+
+              {onOpenArchitecture && (
+                <button
+                  id="sidebar-architecture-btn"
+                  onClick={onOpenArchitecture}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-white/70 hover:text-purple-300 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/25 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Layers className="w-4 h-4 text-purple-400" />
+                    <span>DAG Architecture</span>
+                  </div>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/25">
+                    8-Agent
+                  </span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Operational Workspaces Quick Switcher */}
         <div className="pt-3 border-t border-white/[0.08]">

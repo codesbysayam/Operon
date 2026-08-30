@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { ApprovalCase } from '../types';
 import { StatusBadge } from './StatusBadge';
-import { CheckCircle2, XCircle, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Play,
+  Award,
+  Sparkles,
+  ShieldCheck,
+  Clock,
+  Share2,
+  AlertTriangle,
+  User,
+} from 'lucide-react';
 
 interface ApprovalCardProps {
   caseItem: ApprovalCase;
@@ -10,6 +24,9 @@ interface ApprovalCardProps {
   isSelectable?: boolean;
   onApprove: (id: string, notes?: string) => void;
   onReject: (id: string, notes?: string) => void;
+  onOpenReplay?: (caseItem: ApprovalCase) => void;
+  onOpenCertificate?: (caseItem: ApprovalCase) => void;
+  onInspect?: (caseItem: ApprovalCase) => void;
 }
 
 export const ApprovalCard: React.FC<ApprovalCardProps> = ({
@@ -19,6 +36,9 @@ export const ApprovalCard: React.FC<ApprovalCardProps> = ({
   isSelectable = caseItem.status === 'pending',
   onApprove,
   onReject,
+  onOpenReplay,
+  onOpenCertificate,
+  onInspect,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [notes, setNotes] = useState('');
@@ -87,6 +107,19 @@ export const ApprovalCard: React.FC<ApprovalCardProps> = ({
               <span className="font-mono text-[10px] text-white/50 bg-white/[0.06] px-2 py-0.5 rounded border border-white/[0.08]">
                 {caseItem.caseNumber}
               </span>
+              {caseItem.priority && (
+                <span
+                  className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                    caseItem.priority === 'CRITICAL'
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                      : caseItem.priority === 'HIGH'
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  }`}
+                >
+                  {caseItem.priority}
+                </span>
+              )}
             </div>
             <p className="text-xs text-white/50 mt-0.5">{caseItem.title}</p>
           </div>
@@ -98,9 +131,26 @@ export const ApprovalCard: React.FC<ApprovalCardProps> = ({
               ${caseItem.amount.toFixed(2)}
             </div>
           )}
-          <StatusBadge status={caseItem.status} size="xs" />
+          <div className="flex items-center gap-1.5">
+            {caseItem.slaStatus && (
+              <span
+                className={`text-[10px] font-mono px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                  caseItem.slaStatus === 'breached'
+                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                    : caseItem.slaStatus === 'at_risk'
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                }`}
+              >
+                <Clock className="w-2.5 h-2.5" />
+                {caseItem.slaDeadline || 'SLA Active'}
+              </span>
+            )}
+            <StatusBadge status={caseItem.status} size="xs" />
+          </div>
         </div>
       </div>
+
 
       {/* Summary Box */}
       <p className="text-xs text-white/70 leading-relaxed bg-white/[0.03] p-3.5 rounded-xl border border-white/[0.06]">
@@ -181,14 +231,49 @@ export const ApprovalCard: React.FC<ApprovalCardProps> = ({
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs text-white/60 hover:text-white font-medium flex items-center space-x-1 cursor-pointer transition-colors"
-        >
-          <span>{expanded ? 'Hide Audit Log' : 'View Reasoning & Audit Log'}</span>
-          {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
+      <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] flex-wrap gap-2">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-xs text-white/60 hover:text-white font-medium flex items-center space-x-1 cursor-pointer transition-colors"
+          >
+            <span>{expanded ? 'Hide Audit Log' : 'View Reasoning & Audit Log'}</span>
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          {onInspect && (
+            <button
+              onClick={() => onInspect(caseItem)}
+              className="text-[11px] font-mono text-white/70 hover:text-white px-2 py-1 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-colors flex items-center space-x-1 cursor-pointer"
+              title="Open deep case inspector & evidence graph"
+            >
+              <Share2 className="w-3 h-3 text-[#5EA0FF]" />
+              <span>Inspect Case</span>
+            </button>
+          )}
+
+          {onOpenReplay && (
+            <button
+              onClick={() => onOpenReplay(caseItem)}
+              className="text-[11px] font-mono text-white/50 hover:text-[#FFB000] px-2 py-1 rounded bg-white/[0.04] hover:bg-white/[0.08] transition-colors flex items-center space-x-1 cursor-pointer"
+              title="Open step-by-step playback replay"
+            >
+              <Play className="w-3 h-3 fill-current text-[#FFB000]" />
+              <span>Replay</span>
+            </button>
+          )}
+
+          {isApproved && onOpenCertificate && (
+            <button
+              onClick={() => onOpenCertificate(caseItem)}
+              className="text-[11px] font-mono text-emerald-400/80 hover:text-emerald-300 px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors flex items-center space-x-1 cursor-pointer"
+              title="View cryptographic proof of governance"
+            >
+              <Award className="w-3 h-3" />
+              <span>Certificate</span>
+            </button>
+          )}
+        </div>
 
         {caseItem.status === 'pending' ? (
           <div className="flex items-center space-x-2">
